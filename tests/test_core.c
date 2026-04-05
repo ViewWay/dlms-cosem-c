@@ -104,48 +104,48 @@ void test_core_value(void) {
 
     dlms_value_set_bool(&v, true);
     ASSERT_EQ(v.type, DLMS_DATA_BOOLEAN);
-    ASSERT_TRUE(v.boolean_val);
+    ASSERT_TRUE(v.u.boolean_val);
 
     dlms_value_set_int8(&v, -42);
-    ASSERT_EQ(v.int8_val, -42);
+    ASSERT_EQ(v.u.int8_val, -42);
 
     dlms_value_set_uint8(&v, 200);
-    ASSERT_EQ(v.uint8_val, 200);
+    ASSERT_EQ(v.u.uint8_val, 200);
 
     dlms_value_set_int16(&v, -1000);
-    ASSERT_EQ(v.int16_val, -1000);
+    ASSERT_EQ(v.u.int16_val, -1000);
 
     dlms_value_set_uint16(&v, 60000);
-    ASSERT_EQ(v.uint16_val, 60000);
+    ASSERT_EQ(v.u.uint16_val, 60000);
 
     dlms_value_set_int32(&v, -100000);
-    ASSERT_EQ(v.int32_val, -100000);
+    ASSERT_EQ(v.u.int32_val, -100000);
 
     dlms_value_set_uint32(&v, 4000000000U);
-    ASSERT_EQ(v.uint32_val, 4000000000U);
+    ASSERT_EQ(v.u.uint32_val, 4000000000U);
 
     dlms_value_set_int64(&v, -1);
-    ASSERT_EQ(v.int64_val, -1);
+    ASSERT_EQ(v.u.int64_val, -1);
 
     dlms_value_set_uint64(&v, 0xFFFFFFFFFFFFFFFFULL);
-    ASSERT_EQ(v.uint64_val, 0xFFFFFFFFFFFFFFFFULL);
+    ASSERT_EQ(v.u.uint64_val, 0xFFFFFFFFFFFFFFFFULL);
 
     dlms_value_set_enum(&v, 5);
-    ASSERT_EQ(v.uint8_val, 5);
+    ASSERT_EQ(v.u.uint8_val, 5);
 
     uint8_t data[] = {1,2,3};
     dlms_value_set_octet(&v, data, 3);
-    ASSERT_EQ(v.octet_string.len, 3);
-    ASSERT_MEM_EQ(v.octet_string.data, data, 3);
+    ASSERT_EQ(v.u.octet_string.len, 3);
+    ASSERT_MEM_EQ(v.u.octet_string.data, data, 3);
 
     dlms_value_set_string(&v, "hello", 5);
-    ASSERT_EQ(v.string_val.len, 5);
+    ASSERT_EQ(v.u.string_val.len, 5);
 
     dlms_value_set_float32(&v, 3.14f);
-    ASSERT_TRUE(v.float32_val > 3.0f && v.float32_val < 3.2f);
+    ASSERT_TRUE(v.u.float32_val > 3.0f && v.u.float32_val < 3.2f);
 
     dlms_value_set_float64(&v, 2.71828);
-    ASSERT_TRUE(v.float64_val > 2.7 && v.float64_val < 2.8);
+    ASSERT_TRUE(v.u.float64_val > 2.7 && v.u.float64_val < 2.8);
 }
 
 void test_core_data_type(void) {

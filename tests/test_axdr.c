@@ -140,25 +140,25 @@ void test_axdr_encode(void) {
 
     /* Date */
     v.type = DLMS_DATA_DATE;
-    v.date.year = 2024; v.date.month = 1; v.date.day = 15; v.date.day_of_week = 1;
+    v.u.date.year = 2024; v.u.date.month = 1; v.u.date.day = 15; v.u.date.day_of_week = 1;
     ASSERT_OK(dlms_axdr_encode(&v, buf, sizeof(buf), &w));
     ASSERT_EQ(w, 6u);
     ASSERT_EQ(buf[0], 26);
 
     /* Time */
     v.type = DLMS_DATA_TIME;
-    v.time_val.hour = 12; v.time_val.minute = 30; v.time_val.second = 0; v.time_val.hundredths = 0;
+    v.u.time_val.hour = 12; v.u.time_val.minute = 30; v.u.time_val.second = 0; v.u.time_val.hundredths = 0;
     ASSERT_OK(dlms_axdr_encode(&v, buf, sizeof(buf), &w));
     ASSERT_EQ(w, 5u);
     ASSERT_EQ(buf[0], 27);
 
     /* Datetime */
     v.type = DLMS_DATA_DATETIME;
-    memset(&v.datetime, 0, sizeof(v.datetime));
-    v.datetime.year = 2024; v.datetime.month = 6; v.datetime.day = 15;
-    v.datetime.hour = 12; v.datetime.minute = 30; v.datetime.second = 45;
-    v.datetime.deviation = 60;
-    v.datetime.clock_status = 0;
+    memset(&v.u.datetime, 0, sizeof(v.u.datetime));
+    v.u.datetime.year = 2024; v.u.datetime.month = 6; v.u.datetime.day = 15;
+    v.u.datetime.hour = 12; v.u.datetime.minute = 30; v.u.datetime.second = 45;
+    v.u.datetime.deviation = 60;
+    v.u.datetime.clock_status = 0;
     ASSERT_OK(dlms_axdr_encode(&v, buf, sizeof(buf), &w));
     ASSERT_EQ(w, 13u);
     ASSERT_EQ(buf[0], 25);
@@ -180,40 +180,40 @@ void test_axdr_decode(void) {
     /* Boolean */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x03\x01", 2, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_BOOLEAN);
-    ASSERT_TRUE(v.boolean_val);
+    ASSERT_TRUE(v.u.boolean_val);
 
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x03\x00", 2, &v, &c));
-    ASSERT_FALSE(v.boolean_val);
+    ASSERT_FALSE(v.u.boolean_val);
 
     /* int8 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x0F\xFF", 2, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_INTEGER);
-    ASSERT_EQ(v.int8_val, -1);
+    ASSERT_EQ(v.u.int8_val, -1);
 
     /* uint8 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x11\xC8", 2, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_UNSIGNED_INTEGER);
-    ASSERT_EQ(v.uint8_val, 200);
+    ASSERT_EQ(v.u.uint8_val, 200);
 
     /* int16 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x10\x03\xE8", 3, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_LONG);
-    ASSERT_EQ(v.int16_val, 1000);
+    ASSERT_EQ(v.u.int16_val, 1000);
 
     /* uint16 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x12\x12\x34", 3, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_UNSIGNED_LONG);
-    ASSERT_EQ(v.uint16_val, 0x1234);
+    ASSERT_EQ(v.u.uint16_val, 0x1234);
 
     /* int32 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x05\x12\x34\x56\x78", 5, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_DOUBLE_LONG);
-    ASSERT_EQ(v.int32_val, 0x12345678);
+    ASSERT_EQ(v.u.int32_val, 0x12345678);
 
     /* uint32 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x06\xDE\xAD\xBE\xEF", 5, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_DOUBLE_LONG_UNSIGNED);
-    ASSERT_EQ(v.uint32_val, 0xDEADBEEF);
+    ASSERT_EQ(v.u.uint32_val, 0xDEADBEEF);
 
     /* int64 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x14\x01\x02\x03\x04\x05\x06\x07\x08", 9, &v, &c));
@@ -222,12 +222,12 @@ void test_axdr_decode(void) {
     /* uint64 */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x15\x00\x00\x00\x00\x00\x00\x00\x00", 9, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_UNSIGNED_LONG64);
-    ASSERT_EQ(v.uint64_val, 0u);
+    ASSERT_EQ(v.u.uint64_val, 0u);
 
     /* enum */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x16\x05", 2, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_ENUM);
-    ASSERT_EQ(v.uint8_val, 5);
+    ASSERT_EQ(v.u.uint8_val, 5);
 
     /* float32 */
     float f = 1.0f;
@@ -246,39 +246,39 @@ void test_axdr_decode(void) {
     /* octet string */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x09\x05\x01\x02\x03\x04\x05", 7, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_OCTET_STRING);
-    ASSERT_EQ(v.octet_string.len, 5);
-    ASSERT_EQ(v.octet_string.data[0], 1);
-    ASSERT_EQ(v.octet_string.data[4], 5);
+    ASSERT_EQ(v.u.octet_string.len, 5);
+    ASSERT_EQ(v.u.octet_string.data[0], 1);
+    ASSERT_EQ(v.u.octet_string.data[4], 5);
 
     /* visible string */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x0A\x02\x41\x42", 4, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_VISIBLE_STRING);
-    ASSERT_EQ(v.string_val.len, 2);
+    ASSERT_EQ(v.u.string_val.len, 2);
 
     /* date */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x1A\x07\xE8\x01\x0F\x01", 6, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_DATE);
-    ASSERT_EQ(v.date.year, 2024);
-    ASSERT_EQ(v.date.month, 1);
-    ASSERT_EQ(v.date.day, 15);
+    ASSERT_EQ(v.u.date.year, 2024);
+    ASSERT_EQ(v.u.date.month, 1);
+    ASSERT_EQ(v.u.date.day, 15);
 
     /* time */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x1B\x0C\x1E\x00\x00", 5, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_TIME);
-    ASSERT_EQ(v.time_val.hour, 12);
-    ASSERT_EQ(v.time_val.minute, 30);
+    ASSERT_EQ(v.u.time_val.hour, 12);
+    ASSERT_EQ(v.u.time_val.minute, 30);
 
     /* datetime */
     uint8_t dt[] = {0x19, 0x07,0xE8, 0x06, 0x0F, 0x00, 0x0C, 0x1E, 0x2D, 0x00, 0x00, 0x3C, 0x00};
     ASSERT_OK(dlms_axdr_decode(dt, sizeof(dt), &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_DATETIME);
-    ASSERT_EQ(v.datetime.year, 2024);
-    ASSERT_EQ(v.datetime.month, 6);
+    ASSERT_EQ(v.u.datetime.year, 2024);
+    ASSERT_EQ(v.u.datetime.month, 6);
 
     /* array */
     ASSERT_OK(dlms_axdr_decode((const uint8_t*)"\x01\x02\x03\xFF\x04", 5, &v, &c));
     ASSERT_EQ(v.type, DLMS_DATA_ARRAY);
-    ASSERT_EQ(v.array_val.count, 2);
+    ASSERT_EQ(v.u.array_val.count, 2);
 
     /* Error cases */
     ASSERT_EQ(dlms_axdr_decode(NULL, 1, &v, &c), DLMS_ERROR_INVALID);

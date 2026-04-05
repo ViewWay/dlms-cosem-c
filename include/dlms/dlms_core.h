@@ -133,7 +133,7 @@ typedef struct dlms_value {
             uint16_t count;
             uint16_t capacity;
         } array_val;
-    };
+    } u;
 } dlms_value_t;
 
 /* Byte buffer */
@@ -195,6 +195,7 @@ typedef enum {
 /* Cosem Interface Class IDs */
 typedef enum {
     DLMS_IC_DATA = 1,
+    DLMS_IC_DEMAND = 2,
     DLMS_IC_REGISTER = 3,
     DLMS_IC_EXTENDED_REGISTER = 4,
     DLMS_IC_DEMAND_REGISTER = 5,

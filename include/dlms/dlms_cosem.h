@@ -103,6 +103,83 @@ typedef struct {
 
 int dlms_association_ln_create(dlms_association_ln_object_t *obj, const dlms_obis_t *ln);
 
+/* ===== IC: Demand ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t current_average_value;
+    dlms_value_t last_average_value;
+    dlms_value_t scaler_unit;
+    uint32_t period;
+} dlms_demand_object_t;
+
+int dlms_demand_create(dlms_demand_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Register Monitor ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t monitored_value;
+    dlms_value_t threshold;
+    dlms_value_t scaler_unit;
+    uint8_t monitor_status;
+} dlms_register_monitor_object_t;
+
+int dlms_register_monitor_create(dlms_register_monitor_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Disconnect Control ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    uint8_t control_state;
+    dlms_value_t control_mode;
+} dlms_disconnect_control_object_t;
+
+int dlms_disconnect_control_create(dlms_disconnect_control_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Limiter ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t emergency_cutoff;
+    dlms_value_t monitor_mode;
+    uint8_t limiter_status;
+} dlms_limiter_object_t;
+
+int dlms_limiter_create(dlms_limiter_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Account ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t current_credit;
+    dlms_value_t credit_status;
+    uint8_t account_status;
+} dlms_account_object_t;
+
+int dlms_account_create(dlms_account_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Day Profile ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t calendar_name;
+    uint8_t seasons;
+    uint8_t week_profiles;
+    uint8_t day_profiles;
+} dlms_day_profile_object_t;
+
+int dlms_day_profile_create(dlms_day_profile_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Week Profile ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t profile_name;
+    uint8_t monday;
+    uint8_t tuesday;
+    uint8_t wednesday;
+    uint8_t thursday;
+    uint8_t friday;
+    uint8_t saturday;
+    uint8_t sunday;
+} dlms_week_profile_object_t;
+
+int dlms_week_profile_create(dlms_week_profile_object_t *obj, const dlms_obis_t *ln);
+
 /* ===== IC: Profile Generic ===== */
 typedef struct {
     dlms_cosem_object_t base;

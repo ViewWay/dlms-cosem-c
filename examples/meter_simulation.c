@@ -97,10 +97,10 @@ int main(void) {
             printf("     attr2: type=%s", dlms_data_type_name(val.type));
             switch (val.type) {
                 case DLMS_DATA_DOUBLE_LONG:
-                    printf(" value=%d\n", val.int32_val);
+                    printf(" value=%d\n", val.u.int32_val);
                     break;
                 case DLMS_DATA_DOUBLE_LONG_UNSIGNED:
-                    printf(" value=%u\n", val.uint32_val);
+                    printf(" value=%u\n", val.u.uint32_val);
                     break;
                 case DLMS_DATA_NULL:
                     printf(" (null)\n");
@@ -163,7 +163,7 @@ int main(void) {
     dlms_value_t dv;
     size_t dc;
     ret = dlms_axdr_decode(axdr_buf, aw, &dv, &dc);
-    printf("   Decoded: %d (0x%08X)\n", dv.int32_val, dv.uint32_val);
+    printf("   Decoded: %d (0x%08X)\n", dv.u.int32_val, dv.u.uint32_val);
 
     printf("\n=== Example complete ===\n");
     return 0;

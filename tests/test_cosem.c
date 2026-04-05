@@ -15,7 +15,7 @@ void test_cosem_data(void) {
     dlms_value_t val;
     ASSERT_OK(obj.base.get_attr(&obj.base, 1, &val));
     ASSERT_EQ(val.type, DLMS_DATA_OCTET_STRING);
-    ASSERT_EQ(val.octet_string.len, 6);
+    ASSERT_EQ(val.u.octet_string.len, 6);
 
     /* Get value (attr 2) - default null */
     ASSERT_OK(obj.base.get_attr(&obj.base, 2, &val));
@@ -26,7 +26,7 @@ void test_cosem_data(void) {
     ASSERT_OK(dlms_data_set_value(&obj, &val));
     ASSERT_OK(obj.base.get_attr(&obj.base, 2, &val));
     ASSERT_EQ(val.type, DLMS_DATA_DOUBLE_LONG);
-    ASSERT_EQ(val.int32_val, 42);
+    ASSERT_EQ(val.u.int32_val, 42);
 
     /* Set via base interface */
     dlms_value_t new_val;
@@ -54,13 +54,13 @@ void test_cosem_register(void) {
     dlms_value_t val;
     ASSERT_OK(obj.base.get_attr(&obj.base, 2, &val));
     ASSERT_EQ(val.type, DLMS_DATA_DOUBLE_LONG);
-    ASSERT_EQ(val.int32_val, 0);
+    ASSERT_EQ(val.u.int32_val, 0);
 
     /* Set value */
     dlms_value_set_uint32(&val, 12345);
     ASSERT_OK(dlms_register_set_value(&obj, &val));
     ASSERT_OK(obj.base.get_attr(&obj.base, 2, &val));
-    ASSERT_EQ(val.uint32_val, 12345u);
+    ASSERT_EQ(val.u.uint32_val, 12345u);
 
     /* Scaler/unit (attr 3) */
     ASSERT_OK(obj.base.get_attr(&obj.base, 3, &val));
@@ -86,21 +86,21 @@ void test_cosem_clock(void) {
 
     /* Set datetime */
     val.type = DLMS_DATA_DATETIME;
-    memset(&val.datetime, 0, sizeof(val.datetime));
-    val.datetime.year = 2024;
-    val.datetime.month = 6;
-    val.datetime.day = 15;
-    val.datetime.hour = 12;
-    val.datetime.minute = 30;
-    val.datetime.second = 0;
+    memset(&val.u.datetime, 0, sizeof(val.u.datetime));
+    val.u.datetime.year = 2024;
+    val.u.datetime.month = 6;
+    val.u.datetime.day = 15;
+    val.u.datetime.hour = 12;
+    val.u.datetime.minute = 30;
+    val.u.datetime.second = 0;
     ASSERT_OK(obj.base.set_attr(&obj.base, 2, &val));
     ASSERT_OK(obj.base.get_attr(&obj.base, 2, &val));
-    ASSERT_EQ(val.datetime.year, 2024);
+    ASSERT_EQ(val.u.datetime.year, 2024);
 
     /* Timezone (attr 3) */
     ASSERT_OK(obj.base.get_attr(&obj.base, 3, &val));
     ASSERT_EQ(val.type, DLMS_DATA_OCTET_STRING);
-    ASSERT_EQ(val.octet_string.len, 3);
+    ASSERT_EQ(val.u.octet_string.len, 3);
 
     /* Set timezone */
     uint8_t tz_buf[3] = {0x00, 0x3C, 0x00}; /* +60 min, no DST */
@@ -194,5 +194,5 @@ void test_cosem_association(void) {
     /* Set auth */
     obj.auth_mechanism = DLMS_AUTH_HLS_GMAC;
     ASSERT_OK(obj.base.get_attr(&obj.base, 2, &val));
-    ASSERT_EQ(val.uint8_val, DLMS_AUTH_HLS_GMAC);
+    ASSERT_EQ(val.u.uint8_val, DLMS_AUTH_HLS_GMAC);
 }

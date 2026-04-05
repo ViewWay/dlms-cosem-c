@@ -196,21 +196,21 @@ void dlms_value_init(dlms_value_t *v) {
 }
 
 void dlms_value_set_null(dlms_value_t *v) { dlms_value_init(v); v->type = DLMS_DATA_NULL; }
-void dlms_value_set_bool(dlms_value_t *v, bool val) { dlms_value_init(v); v->type = DLMS_DATA_BOOLEAN; v->boolean_val = val; }
-void dlms_value_set_int8(dlms_value_t *v, int8_t val) { dlms_value_init(v); v->type = DLMS_DATA_INTEGER; v->int8_val = val; }
-void dlms_value_set_uint8(dlms_value_t *v, uint8_t val) { dlms_value_init(v); v->type = DLMS_DATA_UNSIGNED_INTEGER; v->uint8_val = val; }
-void dlms_value_set_int16(dlms_value_t *v, int16_t val) { dlms_value_init(v); v->type = DLMS_DATA_LONG; v->int16_val = val; }
-void dlms_value_set_uint16(dlms_value_t *v, uint16_t val) { dlms_value_init(v); v->type = DLMS_DATA_UNSIGNED_LONG; v->uint16_val = val; }
-void dlms_value_set_int32(dlms_value_t *v, int32_t val) { dlms_value_init(v); v->type = DLMS_DATA_DOUBLE_LONG; v->int32_val = val; }
-void dlms_value_set_uint32(dlms_value_t *v, uint32_t val) { dlms_value_init(v); v->type = DLMS_DATA_DOUBLE_LONG_UNSIGNED; v->uint32_val = val; }
-void dlms_value_set_int64(dlms_value_t *v, int64_t val) { dlms_value_init(v); v->type = DLMS_DATA_LONG64; v->int64_val = val; }
-void dlms_value_set_uint64(dlms_value_t *v, uint64_t val) { dlms_value_init(v); v->type = DLMS_DATA_UNSIGNED_LONG64; v->uint64_val = val; }
-void dlms_value_set_enum(dlms_value_t *v, uint8_t val) { dlms_value_init(v); v->type = DLMS_DATA_ENUM; v->uint8_val = val; }
+void dlms_value_set_bool(dlms_value_t *v, bool val) { dlms_value_init(v); v->type = DLMS_DATA_BOOLEAN; v->u.boolean_val = val; }
+void dlms_value_set_int8(dlms_value_t *v, int8_t val) { dlms_value_init(v); v->type = DLMS_DATA_INTEGER; v->u.int8_val = val; }
+void dlms_value_set_uint8(dlms_value_t *v, uint8_t val) { dlms_value_init(v); v->type = DLMS_DATA_UNSIGNED_INTEGER; v->u.uint8_val = val; }
+void dlms_value_set_int16(dlms_value_t *v, int16_t val) { dlms_value_init(v); v->type = DLMS_DATA_LONG; v->u.int16_val = val; }
+void dlms_value_set_uint16(dlms_value_t *v, uint16_t val) { dlms_value_init(v); v->type = DLMS_DATA_UNSIGNED_LONG; v->u.uint16_val = val; }
+void dlms_value_set_int32(dlms_value_t *v, int32_t val) { dlms_value_init(v); v->type = DLMS_DATA_DOUBLE_LONG; v->u.int32_val = val; }
+void dlms_value_set_uint32(dlms_value_t *v, uint32_t val) { dlms_value_init(v); v->type = DLMS_DATA_DOUBLE_LONG_UNSIGNED; v->u.uint32_val = val; }
+void dlms_value_set_int64(dlms_value_t *v, int64_t val) { dlms_value_init(v); v->type = DLMS_DATA_LONG64; v->u.int64_val = val; }
+void dlms_value_set_uint64(dlms_value_t *v, uint64_t val) { dlms_value_init(v); v->type = DLMS_DATA_UNSIGNED_LONG64; v->u.uint64_val = val; }
+void dlms_value_set_enum(dlms_value_t *v, uint8_t val) { dlms_value_init(v); v->type = DLMS_DATA_ENUM; v->u.uint8_val = val; }
 void dlms_value_set_octet(dlms_value_t *v, const uint8_t *data, uint16_t len) {
-    dlms_value_init(v); v->type = DLMS_DATA_OCTET_STRING; v->octet_string.data = data; v->octet_string.len = len;
+    dlms_value_init(v); v->type = DLMS_DATA_OCTET_STRING; v->u.octet_string.data = data; v->u.octet_string.len = len;
 }
 void dlms_value_set_string(dlms_value_t *v, const char *data, uint16_t len) {
-    dlms_value_init(v); v->type = DLMS_DATA_VISIBLE_STRING; v->string_val.data = data; v->string_val.len = len;
+    dlms_value_init(v); v->type = DLMS_DATA_VISIBLE_STRING; v->u.string_val.data = data; v->u.string_val.len = len;
 }
-void dlms_value_set_float32(dlms_value_t *v, float val) { dlms_value_init(v); v->type = DLMS_DATA_FLOAT32; v->float32_val = val; }
-void dlms_value_set_float64(dlms_value_t *v, double val) { dlms_value_init(v); v->type = DLMS_DATA_FLOAT64; v->float64_val = val; }
+void dlms_value_set_float32(dlms_value_t *v, float val) { dlms_value_init(v); v->type = DLMS_DATA_FLOAT32; v->u.float32_val = val; }
+void dlms_value_set_float64(dlms_value_t *v, double val) { dlms_value_init(v); v->type = DLMS_DATA_FLOAT64; v->u.float64_val = val; }
