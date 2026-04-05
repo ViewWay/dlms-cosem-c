@@ -28,28 +28,34 @@ static void crc16_init_table(void) {
     initialized = true;
 }
 
-uint16_t dlms_crc16(const uint8_t *data, size_t len) {
+static uint16_t crc16_compute(const uint8_t *data, size_t len, uint16_t initial_crc) {
     crc16_init_table();
-    uint16_t crc = 0xFFFF;
-    for (size_t i = 0; i < len; i++) {
-        uint8_t b = dlms_reverse_bits8(data[i]);
-        uint8_t idx = (uint8_t)(((crc >> 8) & 0xFF) ^ b);
-        crc = (uint16_t)(((crc << 8) & 0xFF00) ^ crc16_table[idx]);
-    }
-    /* Reverse and XOR */
-    uint8_t lsb = dlms_reverse_bits8((uint8_t)(crc & 0xFF)) ^ 0xFF;
-    uint8_t msb = dlms_reverse_bits8((uint8_t)((crc >> 8) & 0xFF)) ^ 0xFF;
-    return ((uint16_t)msb << 8) | lsb;
-}
-
-uint16_t dlms_crc16_update(uint16_t crc, const uint8_t *data, size_t len) {
-    crc16_init_table();
+    uint16_t crc = initial_crc;
     for (size_t i = 0; i < len; i++) {
         uint8_t b = dlms_reverse_bits8(data[i]);
         uint8_t idx = (uint8_t)(((crc >> 8) & 0xFF) ^ b);
         crc = (uint16_t)(((crc << 8) & 0xFF00) ^ crc16_table[idx]);
     }
     return crc;
+}
+
+static uint16_t crc16_finalize(uint16_t crc) {
+    /* Reverse and XOR */
+    uint8_t lsb = dlms_reverse_bits8((uint8_t)(crc & 0xFF)) ^ 0xFF;
+    uint8_t msb = dlms_reverse_bits8((uint8_t)((crc >> 8) & 0xFF)) ^ 0xFF;
+    return ((uint16_t)msb << 8) | lsb;
+}
+
+uint16_t dlms_crc16(const uint8_t *data, size_t len) {
+    return crc16_finalize(crc16_compute(data, len, 0xFFFF));
+}
+
+uint16_t dlms_crc16_update(uint16_t crc, const uint8_t *data, size_t len) {
+    /* For incremental updates, reverse the finalization before continuing */
+    uint8_t lsb = dlms_reverse_bits8((uint8_t)(crc & 0xFF)) ^ 0xFF;
+    uint8_t msb = dlms_reverse_bits8((uint8_t)((crc >> 8) & 0xFF)) ^ 0xFF;
+    uint16_t unfinalized = ((uint16_t)msb << 8) | lsb;
+    return crc16_finalize(crc16_compute(data, len, unfinalized));
 }
 
 /* ===== HDLC byte stuffing ===== */

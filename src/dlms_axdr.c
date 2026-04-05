@@ -8,18 +8,18 @@
 /* ===== Internal helpers ===== */
 
 static int encode_length_prefix(uint32_t len, uint8_t *dst, size_t cap, size_t *w) {
-    if (len <= 0x7F) {
+    if (len <= 127) {
         if (cap < 1) return DLMS_ERROR_BUFFER;
         dst[0] = (uint8_t)len;
         *w = 1;
     } else if (len <= 0xFF) {
         if (cap < 2) return DLMS_ERROR_BUFFER;
-        dst[0] = 0x81;
+        dst[0] = 0x82;
         dst[1] = (uint8_t)len;
         *w = 2;
     } else if (len <= 0xFFFF) {
         if (cap < 3) return DLMS_ERROR_BUFFER;
-        dst[0] = 0x82;
+        dst[0] = 0x84;
         dst[1] = (uint8_t)(len >> 8);
         dst[2] = (uint8_t)(len & 0xFF);
         *w = 3;
@@ -36,7 +36,15 @@ static int decode_length_prefix(const uint8_t *data, size_t len, uint32_t *out, 
         *consumed = 1;
         return DLMS_OK;
     }
-    uint8_t nbytes = (data[0] >> 4) & 0x0F;  /* DLMS: low nibble = byte count */
+    /* DLMS A-XDR length prefix: 0x82 = 1 byte follows, 0x84 = 2 bytes follow */
+    uint8_t nbytes;
+    if (data[0] == 0x82) {
+        nbytes = 1;
+    } else if (data[0] == 0x84) {
+        nbytes = 2;
+    } else {
+        return DLMS_ERROR_PARSE;
+    }
     if (nbytes == 0 || (size_t)(1 + nbytes) > len) return DLMS_ERROR_PARSE;
     uint32_t val = 0;
     for (uint8_t i = 0; i < nbytes; i++) {

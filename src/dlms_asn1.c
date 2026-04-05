@@ -309,15 +309,26 @@ int dlms_aarq_decode(const uint8_t *data, size_t len, dlms_aarq_t *aarq, size_t 
                 /* Parse initiate request fields */
                 size_t ir_pos = 0;
                 const uint8_t *ir = data + pos;
-                /* Skip conformance default */
+                /* Protocol version default indicator */
                 if (ir_pos < ir_len && ir[ir_pos] == 0x00) ir_pos++;
+                /* Conformance default indicator */
+                if (ir_pos < ir_len && ir[ir_pos] == 0x00) {
+                    ir_pos++;
+                } else if (ir_pos < ir_len && ir[ir_pos] == 0x01) {
+                    ir_pos++;
+                    ir_pos += 4;  /* Skip 4 bytes of conformance */
+                }
                 /* DLMS version */
-                if (ir_pos + 1 < ir_len && ir[ir_pos] == 0x01) {
+                if (ir_pos < ir_len && ir[ir_pos] == 0x00) {
+                    ir_pos++;  /* Default version */
+                } else if (ir_pos + 1 < ir_len && ir[ir_pos] == 0x01) {
                     ir_pos++;
                     aarq->dlms_version = ir[ir_pos++];
                 }
                 /* Auth mechanism */
-                if (ir_pos + 1 < ir_len && ir[ir_pos] == 0x01) {
+                if (ir_pos < ir_len && ir[ir_pos] == 0x00) {
+                    ir_pos++;  /* Default auth */
+                } else if (ir_pos + 1 < ir_len && ir[ir_pos] == 0x01) {
                     ir_pos++;
                     aarq->auth_mech = (dlms_auth_mechanism_t)ir[ir_pos++];
                 }
