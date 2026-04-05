@@ -1,120 +1,58 @@
-# DLMS/COSEM C99 Embedded Library
+# dlms-cosem-c
 
-纯 C99 实现的 DLMS/COSEM 协议栈，面向嵌入式系统设计。
+**Complete DLMS/COSEM protocol stack for C99** — zero malloc, embedded-friendly implementation with ASN.1, A-XDR, HDLC, and COSEM IC classes.
 
-## 特性
+[![Tests](https://img.shields.io/badge/tests-36%20passed-brightgreen)]()
+[![C99](https://img.shields.io/badge/C-99-blue.svg)]()
+[![Embedded](https://img.shields.io/badge/embedded-friendly-green.svg)]()
+[![License: BSL 1.1](https://img.shields.io/badge/license-BSL%201.1-orange.svg)]()
 
-- **纯 C99** - 无动态内存分配，零外部依赖
-- **嵌入式友好** - 栈分配，固定大小缓冲区，可配置宏
-- **SM4 国密** - 完整的 SM4 查表实现（S-box + CTR/CBC/GCM）
-- **AES-128** - 查表实现，支持 GCM/GMAC
-- **模块化** - 可裁剪，不需要的模块可以不编译
-- **240+ 测试** - 覆盖所有核心功能
+## Features
 
-## 模块
+- **Zero malloc**: All stack allocation, suitable for bare-metal embedded systems
+- **Pure C99**: No C11/C++ dependencies, compiles on any C99 toolchain
+- **ASN.1 BER**: Tag-length-value encoding/decoding
+- **A-XDR Codec**: DLMS data encoding
+- **HDLC Framing**: LLC/MAC layer with CRC-16
+- **COSEM IC Classes**: Interface classes with virtual dispatch pattern
+- **Security**: SM4 block cipher
 
-| 模块 | 说明 |
-|------|------|
-| `dlms_core` | OBIS 码、数据类型、缓冲区、工具函数 |
-| `dlms_hdlc` | HDLC 帧编解码、CRC-16、字节填充、流式解析 |
-| `dlms_axdr` | A-XDR 编解码，支持所有 DLMS 数据类型 |
-| `dlms_asn1` | BER-TLV、AARQ/AARE 关联请求/响应 |
-| `dlms_security` | SM4/AES-128、GCM/GMAC、HLS-ISM、安全控制 |
-| `dlms_cosem` | COSEM 接口类（Data/Register/Clock/SecuritySetup/ProfileGeneric） |
-| `dlms_client` | DLMS 客户端（关联/读/写/动作） |
-
-## 快速开始
+## Building
 
 ```bash
-# 编译
-make all
-
-# 运行测试
-make test
-
-# 运行示例
-make example
-
-# CMake
-mkdir build && cd build
-cmake ..
-make
-ctest
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j$(nproc)
+ctest --output-on-failure
 ```
 
-## API 示例
+Or with GCC directly:
 
-### OBIS 码
-
-```c
-dlms_obis_t obis;
-dlms_obis_from_string("0.0.1.8.0.255", &obis);
-char buf[32];
-dlms_obis_to_string(&obis, buf, sizeof(buf));
+```bash
+gcc -std=c99 -Wall -Wextra -Wpedantic -I include src/*.c tests/*.c -o test && ./test
 ```
 
-### HDLC 帧编解码
+## Design Principles
 
-```c
-dlms_hdlc_address_t server = { .logical_address = 1 };
-dlms_hdlc_address_t client = { .logical_address = 16 };
-uint8_t frame[128];
-int len = dlms_hdlc_build_snrm(frame, sizeof(frame), &server, &client, &params);
-```
+- **Fixed-size buffers**: No dynamic allocation, predictable memory usage
+- **No STL/libc++**: Only standard C library functions
+- **Virtual dispatch**: C-style vtable pattern for IC class polymorphism
+- **Compact**: ~6K lines across 23 files
 
-### AXDR 编解码
+## COSEM IC Classes
 
-```c
-dlms_value_t val;
-dlms_value_set_int32(&val, 42);
-uint8_t buf[16];
-size_t w;
-dlms_axdr_encode(&val, buf, sizeof(buf), &w);
-```
+Demand, Register Monitor, Disconnect Control, Limiter, Account, Day Profile, Week Profile, and core infrastructure classes.
 
-### SM4 加密
+## Multi-Language Family
 
-```c
-uint8_t key[16], iv[12], plain[16], cipher[16], tag[12];
-dlms_sm4_gcm_encrypt(key, iv, NULL, 0, plain, 16, cipher, tag);
-```
+| Language | Tests | Lines |
+|----------|-------|-------|
+| [Python](https://github.com/ViewWay/dlms-cosem) | 5,146 | 37K |
+| [Rust](https://github.com/ViewWay/dlms-cosem-rust) | 739 | 21K |
+| [Go](https://github.com/ViewWay/dlms-cosem-go) | 362 | 8K |
+| [C++](https://github.com/ViewWay/dlms-cosem-cpp) | 280+ | 6.5K |
+| **C** | **36** | **6.2K** |
 
-### COSEM 对象
+## License
 
-```c
-dlms_data_object_t data;
-dlms_obis_t ln = {{0,0,1,0,0,255}};
-dlms_data_create(&data, &ln);
-dlms_value_set_int32(&data_val, 100);
-dlms_data_set_value(&data, &data_val);
-```
-
-## 编译配置
-
-通过宏自定义缓冲区大小：
-
-```c
-#define DLMS_HDLC_MAX_FRAME_SIZE  512
-#define DLMS_HDLC_MAX_INFO_LEN    400
-#define DLMS_COSEM_MAX_OBJECTS    128
-```
-
-## 安全套件支持
-
-| Suite | 算法 | 状态 |
-|-------|------|------|
-| 0 | AES-128-GCM | ✅ |
-| 1 | AES-128-GCM | ✅ |
-| 2 | AES-256-GCM | ⚠️ 密钥派生 |
-| 5 | SM4-GCM | ✅ |
-
-## 许可证
-
-MIT License
-
-## 参考
-
-- IEC 62056-53 (DLMS/COSEM Application Layer)
-- IEC 62056-46 (HDLC)
-- GB/T 32907-2016 (SM4)
-- DLMS UA 1000-1 (Blue Book)
+BSL 1.1
