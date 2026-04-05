@@ -493,6 +493,99 @@ int dlms_week_profile_create(dlms_week_profile_object_t *obj, const dlms_obis_t 
     return DLMS_OK;
 }
 
+/* ===== IC: Extended Register ===== */
+
+static int extended_register_get_attr(const dlms_cosem_object_t *obj, uint8_t attr_index, dlms_value_t *value) {
+    dlms_extended_register_object_t *r = (dlms_extended_register_object_t *)obj;
+    if (attr_index == 2) { *value = r->value; return DLMS_OK; }
+    if (attr_index == 3) { *value = r->scaler_unit; return DLMS_OK; }
+    if (attr_index == 1) {
+        uint8_t ln[6]; memcpy(ln, r->base.logical_name.bytes, 6);
+        dlms_value_set_octet(value, ln, 6);
+        return DLMS_OK;
+    }
+    return DLMS_ERROR_NOT_SUPPORTED;
+}
+
+int dlms_extended_register_create(dlms_extended_register_object_t *obj, const dlms_obis_t *ln) {
+    if (!obj || !ln) return DLMS_ERROR_INVALID;
+    memset(obj, 0, sizeof(*obj));
+    obj->base.class_id = DLMS_IC_EXTENDED_REGISTER;
+    obj->base.version = 0;
+    obj->base.logical_name = *ln;
+    obj->base.name = "ExtendedRegister";
+    obj->base.get_attr = extended_register_get_attr;
+    obj->base.set_attr = NULL;
+    obj->base.action = NULL;
+    obj->base.attr_count = 3;
+    obj->base.method_count = 0;
+    dlms_value_set_int32(&obj->value, 0);
+    return DLMS_OK;
+}
+
+/* ===== IC: Demand Register ===== */
+
+static int demand_register_get_attr(const dlms_cosem_object_t *obj, uint8_t attr_index, dlms_value_t *value) {
+    dlms_demand_register_object_t *d = (dlms_demand_register_object_t *)obj;
+    if (attr_index == 2) { *value = d->current_value; return DLMS_OK; }
+    if (attr_index == 3) { *value = d->scaler_unit; return DLMS_OK; }
+    if (attr_index == 4) { dlms_value_set_uint32(value, d->period); return DLMS_OK; }
+    if (attr_index == 1) {
+        uint8_t ln[6]; memcpy(ln, d->base.logical_name.bytes, 6);
+        dlms_value_set_octet(value, ln, 6);
+        return DLMS_OK;
+    }
+    return DLMS_ERROR_NOT_SUPPORTED;
+}
+
+int dlms_demand_register_create(dlms_demand_register_object_t *obj, const dlms_obis_t *ln) {
+    if (!obj || !ln) return DLMS_ERROR_INVALID;
+    memset(obj, 0, sizeof(*obj));
+    obj->base.class_id = DLMS_IC_DEMAND_REGISTER;
+    obj->base.version = 0;
+    obj->base.logical_name = *ln;
+    obj->base.name = "DemandRegister";
+    obj->base.get_attr = demand_register_get_attr;
+    obj->base.set_attr = NULL;
+    obj->base.action = NULL;
+    obj->base.attr_count = 4;
+    obj->base.method_count = 0;
+    dlms_value_set_int32(&obj->current_value, 0);
+    obj->period = 900;
+    return DLMS_OK;
+}
+
+/* ===== IC: Credit ===== */
+
+static int credit_get_attr(const dlms_cosem_object_t *obj, uint8_t attr_index, dlms_value_t *value) {
+    dlms_credit_object_t *c = (dlms_credit_object_t *)obj;
+    if (attr_index == 2) { *value = c->credit_amount; return DLMS_OK; }
+    if (attr_index == 3) { dlms_value_set_uint8(value, c->credit_status); return DLMS_OK; }
+    if (attr_index == 1) {
+        uint8_t ln[6]; memcpy(ln, c->base.logical_name.bytes, 6);
+        dlms_value_set_octet(value, ln, 6);
+        return DLMS_OK;
+    }
+    return DLMS_ERROR_NOT_SUPPORTED;
+}
+
+int dlms_credit_create(dlms_credit_object_t *obj, const dlms_obis_t *ln) {
+    if (!obj || !ln) return DLMS_ERROR_INVALID;
+    memset(obj, 0, sizeof(*obj));
+    obj->base.class_id = DLMS_IC_CREDIT;
+    obj->base.version = 0;
+    obj->base.logical_name = *ln;
+    obj->base.name = "Credit";
+    obj->base.get_attr = credit_get_attr;
+    obj->base.set_attr = NULL;
+    obj->base.action = NULL;
+    obj->base.attr_count = 3;
+    obj->base.method_count = 0;
+    dlms_value_set_int32(&obj->credit_amount, 0);
+    obj->credit_status = 0;
+    return DLMS_OK;
+}
+
 /* ===== COSEM Object Collection ===== */
 
 int dlms_cosem_list_init(dlms_cosem_object_list_t *list) {

@@ -180,6 +180,34 @@ typedef struct {
 
 int dlms_week_profile_create(dlms_week_profile_object_t *obj, const dlms_obis_t *ln);
 
+/* ===== IC: Extended Register ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t value;
+    dlms_value_t scaler_unit;
+} dlms_extended_register_object_t;
+
+int dlms_extended_register_create(dlms_extended_register_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Demand Register ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t current_value;
+    dlms_value_t scaler_unit;
+    uint32_t period;
+} dlms_demand_register_object_t;
+
+int dlms_demand_register_create(dlms_demand_register_object_t *obj, const dlms_obis_t *ln);
+
+/* ===== IC: Credit ===== */
+typedef struct {
+    dlms_cosem_object_t base;
+    dlms_value_t credit_amount;
+    uint8_t credit_status;
+} dlms_credit_object_t;
+
+int dlms_credit_create(dlms_credit_object_t *obj, const dlms_obis_t *ln);
+
 /* ===== IC: Profile Generic ===== */
 typedef struct {
     dlms_cosem_object_t base;
